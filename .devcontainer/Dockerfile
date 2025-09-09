@@ -6,9 +6,10 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TERM xterm
 
-RUN sudo apt-get update
-RUN sudo apt-get install --no-install-recommends -y \
+# Install system tools and development packages
+RUN apt-get update && apt-get install --no-install-recommends -y \
   sudo \
   binutils-common \
   make \
@@ -18,12 +19,32 @@ RUN sudo apt-get install --no-install-recommends -y \
   build-essential \
   python3 \
   python3-dev \
-  python3-pip \
+  python3-venv \
+  pipx \
   binutils \
-  make \
   qemu-system-arm \
   gcc-arm-none-eabi \
-  gdb-multiarch
+  gdb-multiarch \
+  gcc-riscv64-unknown-elf \
+  ca-certificates \
+  curl \
+  nano \
+  ssh \
+  less \
+  binutils-riscv64-linux-gnu \
+  qemu-system-riscv32 \
+  zsh \
+  xxd \
+  strace \
+  man && \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# terminal colors with xterm
-ENV TERM xterm
+# Set up pipx to install CLI tools like pygmentize
+ENV PIPX_HOME=/usr/local/pipx
+ENV PATH=$PIPX_HOME/bin:$PATH
+
+# Install Pygments via pipx safely
+RUN pipx install pygments
+
+# Download gdb-dashboard
+RUN wget -O /root/.gdbinit https://raw.githubusercontent.com/cyrus-and/gdb-dashboard/master/.gdbinit
